@@ -1,0 +1,61 @@
+Problem:  Count Number of Maximum Bitwise-OR Subsets
+
+Problem Description:  
+
+Given an integer array nums, find the maximum possible bitwise OR of a subset of nums and return the number of different non-empty subsets with the maximum bitwise OR.
+An array a is a subset of an array b if a can be obtained from b by deleting some (possibly zero) elements of b. Two subsets are considered different if the indices of the elements chosen are different.
+The bitwise OR of an array a is equal to a[0] OR a[1] OR ... OR a[a.length - 1] (0-indexed).
+
+
+Example 1:
+Input: nums = [3,1]
+Output: 2
+Explanation: The maximum possible bitwise OR of a subset is 3. There are 2 subsets with a bitwise OR of 3:
+- [3]
+- [3,1]
+
+Example 2:
+Input: nums = [2,2,2]
+Output: 7
+Explanation: All non-empty subsets of [2,2,2] have a bitwise OR of 2. There are 23 - 1 = 7 total subsets.
+
+Approach: 
+
+In this problem, we first find the maximum element by taking the OR of each element present in the array. 
+After that, we apply recursion within a loop to explore the "take" and "non-take" patterns. Take condition,
+If we take the element, we increment the index by 1 and compute the OR of the current element with the maximum
+element. Non-take condition, If we do not take the element, we simply increment the index by 1.Finally, we sum
+the results from the "take" and "non-take" condition. Since we encounter repeating patterns during the process,
+we apply memoization and tabulation techniques to optimize the solution and reduce the time complexity.
+
+Code: 
+
+class Solution {
+public:
+    int totalSubset(int index,int curr,vector<int> &nums,int maxi,vector<vector<int>> &dp){
+        if(index==nums.size()){
+            if(curr==maxi){
+                return 1;
+            }
+            return 0;
+        }
+        if(dp[index][curr]!=-1){
+            return dp[index][curr];
+        }
+
+        int take=totalSubset(index+1,curr | nums[index],nums,maxi,dp);
+        int nontake=totalSubset(index+1,curr,nums,maxi,dp);
+
+        return dp[index][curr]=take+nontake;
+    }
+    int countMaxOrSubsets(vector<int>& nums) {
+        int maxi=0;
+        int n=nums.size();
+        for(int &num:nums){
+            maxi |=num;
+        }
+        vector<vector<int>> dp(n+1,vector<int> (maxi+1,-1));
+        int curr=0;
+        return totalSubset(0,curr,nums,maxi,dp);
+    }
+};
