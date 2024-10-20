@@ -1,0 +1,97 @@
+Problem:  Parsing A Boolean Expression
+
+Problem Description: 
+A boolean expression is an expression that evaluates to either true or false. It can be in one of the following shapes:
+'t' that evaluates to true.
+'f' that evaluates to false.
+'!(subExpr)' that evaluates to the logical NOT of the inner expression subExpr.
+'&(subExpr1, subExpr2, ..., subExprn)' that evaluates to the logical AND of the inner expressions subExpr1, subExpr2, ..., subExprn where n >= 1.
+'|(subExpr1, subExpr2, ..., subExprn)' that evaluates to the logical OR of the inner expressions subExpr1, subExpr2, ..., subExprn where n >= 1.
+Given a string expression that represents a boolean expression, return the evaluation of that expression.
+It is guaranteed that the given expression is valid and follows the given rules.
+
+Example 1:
+Iput: expression = "&(|(f))"
+Output: false
+Explanation: 
+First, evaluate |(f) --> f. The expression is now "&(f)".
+Then, evaluate &(f) --> f. The expression is now "f".
+Finally, return false.
+
+Approach:
+
+In this problem, we first create a stack and push all the operators and opening brackets into the stack. If a comma (,) 
+appears, we simply skip it and move to the next element. If a closing bracket is encountered, we pop all the operators 
+from the stack until an opening bracket is found. We store these operators in a vector because they are important for 
+further processing. Next, we define a function where we pass a vector and an operator. Inside the function, we handle 
+five cases: AND, OR, NOT, Logical AND, and Logical OR. For each operator, we perform the corresponding operation. At the
+end of the problem, we return the final answer.
+
+
+code:
+
+class Solution {
+public:
+
+    char parseBoolExprHelper(vector<char>& helper, char op) {
+        if (op == '&') { 
+            for (char &s : helper) {
+                if (s == 'f') 
+                return 'f'; 
+            }
+            return 't'; 
+        } 
+
+        if (op == '|') { 
+            for (char &s : helper) {
+                if (s == 't') 
+                return 't'; 
+            }
+            return 'f'; 
+        }
+
+        if (op == '!') { 
+            if(helper[0] == 't'){ 
+            return 'f';
+            } 
+            return 't'; 
+        }
+
+        return 't'; 
+    }
+
+   
+    bool parseBoolExpr(string expression) {
+        int n = expression.length();
+        stack<char> st; 
+
+        for (int i = 0; i < n; i++) {
+            if (expression[i] == ',') {
+                continue; 
+            } 
+
+            if (expression[i] == ')') { 
+                vector<char> helper;
+
+               
+                while (st.top() != '(') {
+                    helper.push_back(st.top());
+                    st.pop();
+                }
+                st.pop(); 
+
+                char op = st.top(); 
+                st.pop(); 
+
+                
+                st.push(parseBoolExprHelper(helper, op));
+            } 
+            else {
+                st.push(expression[i]); 
+            }
+        }
+
+        return st.top() == 't';
+    }
+};
+
